@@ -1,0 +1,61 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Check-In</title>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    #qr-reader {
+      width: 300px;
+      margin: 20px auto;
+    }
+    #result {
+      font-size: 18px;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>SONGCRAMANAVA QR Check-In</h1>
+  <div id="qr-reader"></div>
+  <div id="result">Scan a QR code to check in</div>
+
+  <script>
+    const webAppURL = "https://script.google.com/macros/s/AKfycbw-T0J4Wjkv-eOOQMxGpam0VxLjEAUx3kfk8RQlqCWVEpBxErjTdSxTOfJZYADZ_9FOEQ/exec"; // Replace with your actual Web App URL
+
+    function handleScanSuccess(qrCodeMessage) {
+      document.getElementById("result").textContent = "🔍 Verifying...";
+
+      fetch(`${webAppURL}?qr=${encodeURIComponent(qrCodeMessage)}`)
+        .then(res => res.text())
+        .then(response => {
+          document.getElementById("result").textContent = response;
+        })
+        .catch(err => {
+          document.getElementById("result").textContent = "❌ Error verifying QR code.";
+          console.error("Fetch error:", err);
+        });
+    }
+
+    const html5QrCode = new Html5Qrcode("qr-reader");
+    const config = { fps: 10, qrbox: 250 };
+
+    html5QrCode.start(
+      { facingMode: "environment" },
+      config,
+      handleScanSuccess
+    ).catch(err => {
+      document.getElementById("result").textContent = "❌ Camera access error.";
+      console.error(err);
+    });
+  </script>
+</body>
+</html>
